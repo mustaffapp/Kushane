@@ -4,197 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kuşhane</title>
-    <link rel="manifest" href="manifest.json">
     <style>
-    
         @import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap');
-       
         :root {
-            --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.15);
-            /* Buton Renkleri */
-            --dark-red-active: #8B0000;
-            --dark-maroon-passive: #4b0000;
-            --dark-green-active: #006400;
-            --dark-emerald-passive: #043927;
+            --ac-aktif: #8B0000;
+            --kapat-aktif: #228B22;
+            --border-light: rgba(255, 255, 255, 0.15);
         }
-
         body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0; padding: 0; height: 100%; width: 100%;
             background: #0f0f0f url('pigeon_darkened.jpg') no-repeat center center fixed;
-            background-size: cover;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden;
+            background-size: cover; display: flex; justify-content: center; align-items: center;
+            font-family: sans-serif; overflow: hidden;
         }
-
-        /* Üst Başlık - Cam Çerçeve */
-        .title-container {
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 10px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .app-wrapper {
+            width: 100%; max-width: 400px; height: 100%;
+            display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+            position: relative; padding: 20px; box-sizing: border-box;
         }
-
+        .top-icon {
+            position: absolute; top: 30px; width: 1.6rem; height: 1.6rem;
+            cursor: pointer; z-index: 100; opacity: 0.9;
+            filter: drop-shadow(0.5px 0 0 white) drop-shadow(-0.5px 0 0 white) drop-shadow(0 0.5px 0 white) drop-shadow(0 -0.5px 0 white);
+        }
+        .pass-btn { left: 30px; }
+        .settings-btn { right: 30px; }
         .app-title {
-            font-family: 'Playwrite Australia Tasmania', cursive;
-            font-size: 1.8rem;
-            color: white;
-            letter-spacing: 1px;
+            align-self: center; font-family: 'Playwrite AU TAS', cursive;
+            font-size: 2.32rem; color: #000000; font-weight: bold;
+            -webkit-text-stroke: 1px white; paint-order: stroke fill;
+            position: relative; top: -40px; margin-bottom: 25px;
         }
-
-        /* Durum Yazısı */
-        .status-display {
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-bottom: 25px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        .door-status-box { display: flex; align-items: center; margin-bottom: 40px; margin-left: 10%; }
+        #bird-house-icon {
+            width: 1.6em; height: 1.6em; margin-right: 20px;
+            filter: drop-shadow(0.5px 0 0 white) drop-shadow(-0.5px 0 0 white) drop-shadow(0 0.5px 0 white) drop-shadow(0 -0.5px 0 white);
         }
-
-        /* Ana Kart */
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border);
-            border-radius: 35px;
-            padding: 30px;
-            width: 280px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        .door-label, #door-status-text { 
+            font-size: 1.4rem; font-weight: bold; color: #000000;
+            -webkit-text-stroke: 1px white; paint-order: stroke fill;
         }
-
-        /* Numpad */
-        .numpad {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+        .controls-area { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; align-self: center; }
+        .btn { 
+            width: 100%; padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1);
+            font-size: 1.1rem; font-weight: bold; color: white; transition: all 0.4s ease; cursor: pointer;
         }
-
-        .numpad button {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 18px;
-            font-size: 1.3rem;
-            color: white;
-            cursor: pointer;
+        .btn:not(.passive) { box-shadow: 0 8px 20px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.25); }
+        .btn.passive { opacity: 0.15; pointer-events: none; filter: grayscale(100%); }
+        #btn-open { background-color: var(--ac-aktif); }
+        #btn-close { background-color: var(--kapat-aktif); }
+        .conn-status { 
+            font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 8px;
+            -webkit-text-stroke: 0.3px white; paint-order: stroke fill; margin-left: 10%;
         }
-
-        /* Kontrol Butonları */
-        .controls { display: flex; flex-direction: column; gap: 12px; }
-
-        .btn {
-            width: 100%;
-            padding: 20px;
-            border-radius: 18px;
-            border: none;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            transition: 0.3s;
+        #conn-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        .numpad-area {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light);
+            border-radius: 30px; padding: 25px; width: 100%; max-width: 300px; text-align: center; align-self: center;
         }
-
-        .btn.passive { opacity: 0.4; pointer-events: none; }
-
-        #btn-open { background-color: var(--dark-red-active); }
-        #btn-open.passive { background-color: var(--dark-maroon-passive); }
-        #btn-close { background-color: var(--dark-green-active); }
-        #btn-close.passive { background-color: var(--dark-emerald-passive); }
-
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .numpad button { 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-light);
+            border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white;
+        }
         #pass-display {
-            width: 100%; padding: 12px; margin-bottom: 15px;
-            background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-            color: white; text-align: center; font-size: 1.2rem; border-radius: 10px;
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.2); 
+            color: white; text-align: center; border-radius: 10px; border: 1px solid var(--border-light);
         }
     </style>
 </head>
 <body>
-
-    <div class="title-container">
-        <div class="app-title">- Kuşhane -</div>
-    </div>
-
-    <div id="status-text" class="status-display">Bağlanıyor...</div>
-
-    <div class="card" id="app-card">
+    <div class="app-wrapper">
+        <img class="top-icon pass-btn" src="lock_icon.png" onclick="resetAuth()">
+        <img class="top-icon settings-btn" src="settings_icon.png" onclick="openSettings()">
+        <div class="app-title">— Kuşhane —</div>
+        <div class="door-status-box">
+            <img id="bird-house-icon" src="birdhouse_icon.png">
+            <span class="door-label">Kapı: </span>
+            <span id="door-status-text"></span>
         </div>
-
+        <div id="app-content" style="width:100%; display:flex; justify-content:center;"></div>
+        <div class="conn-status">
+            <span id="conn-dot"></span>
+            <span id="conn-text">Bağlantı aranıyor</span>
+        </div>
+    </div>
     <script>
-        const ESP32_IP = "http://192.168.1.50"; // Burayı kendi IP'nizle değiştirin
-        let currentPass = "";
+        let ESP32_IP = localStorage.getItem('kushane_ip') || "http://192.168.1.50";
         let isAuth = localStorage.getItem('kushane_auth') === 'true';
+        let currentPass = "";
+
+        function openSettings() {
+            let newIP = prompt("IP:", ESP32_IP);
+            if (newIP) { localStorage.setItem('kushane_ip', newIP); location.reload(); }
+        }
+        function resetAuth() { localStorage.removeItem('kushane_auth'); localStorage.removeItem('kushane_pass'); location.reload(); }
 
         function render() {
-            const card = document.getElementById('app-card');
+            const container = document.getElementById('app-content');
             if (!isAuth) {
-                card.innerHTML = `
+                container.innerHTML = `<div class="numpad-area">
                     <input type="password" id="pass-display" readonly placeholder="ŞİFRE">
                     <div class="numpad">
                         ${[1,2,3,4,5,6,7,8,9].map(n => `<button onclick="addNum('${n}')">${n}</button>`).join('')}
-                        <button onclick="clearPass()">⌫</button>
-                        <button onclick="addNum('0')">0</button>
-                        <button onclick="checkPass()">✓</button>
-                    </div>`;
+                        <button onclick="clearPass()">⌫</button><button onclick="addNum('0')">0</button><button onclick="checkPass()">✓</button>
+                    </div></div>`;
             } else {
-                card.innerHTML = `
-                    <div class="controls">
-                        <button id="btn-open" class="btn" onclick="send('open')">Aç</button>
-                        <button id="btn-close" class="btn" onclick="send('close')">Kapat</button>
-                    </div>`;
-                updateStatus();
+                container.innerHTML = `<div class="controls-area">
+                    <button id="btn-open" class="btn" onclick="send('open')">Aç</button>
+                    <button id="btn-close" class="btn" onclick="send('close')">Kapat</button>
+                </div>`;
+                updateStatus(); 
             }
         }
 
-        function addNum(n) { if(currentPass.length < 4) currentPass += n; document.getElementById('pass-display').value = currentPass; }
+        function addNum(n) { if(currentPass.length < 4) { currentPass += n; document.getElementById('pass-display').value = currentPass; } }
         function clearPass() { currentPass = currentPass.slice(0,-1); document.getElementById('pass-display').value = currentPass; }
-        
-        async function checkPass() {
-            // Basitlik için burada doğrudan onaylıyoruz, ESP32 tarafında da doğrulanmalı
+        function checkPass() {
             if(currentPass.length === 4) {
                 localStorage.setItem('kushane_pass', currentPass);
-                isAuth = true;
                 localStorage.setItem('kushane_auth', 'true');
-                render();
+                isAuth = true; render();
             }
         }
 
         async function updateStatus() {
+            const bOpen = document.getElementById('btn-open'), bClose = document.getElementById('btn-close');
+            const dStatus = document.getElementById('door-status-text'), cText = document.getElementById('conn-text'), cDot = document.getElementById('conn-dot');
+            if (!cText) return; 
             try {
-                const res = await fetch(`${ESP32_IP}/status`);
+                const res = await fetch(`${ESP32_IP}/status`, { signal: AbortSignal.timeout(2000) });
                 const data = await res.json();
-                const stat = document.getElementById('status-text');
-                const bOpen = document.getElementById('btn-open');
-                const bClose = document.getElementById('btn-close');
-
+                cText.innerText = "Bağlı"; cText.style.color = "#228B22"; cDot.style.backgroundColor = "#228B22";
                 if (data.locked) {
-                    stat.innerText = "Kapı Kapalı"; stat.style.color = "black";
-                    bOpen.className = "btn"; bClose.className = "btn passive";
+                    dStatus.innerText = "Kapalı"; dStatus.style.color = "#228B22";
+                    if(bOpen) bOpen.classList.remove('passive'); if(bClose) bClose.classList.add('passive');
                 } else {
-                    stat.innerText = "Kapı Açık"; stat.style.color = "red";
-                    bOpen.className = "btn passive"; bClose.className = "btn";
+                    dStatus.innerText = "Açık"; dStatus.style.color = "#8B0000";
+                    if(bOpen) bOpen.classList.add('passive'); if(bClose) bClose.classList.remove('passive');
                 }
-            } catch (e) { document.getElementById('status-text').innerText = "Çevrimdışı"; }
+            } catch (e) { 
+                cText.innerText = "Bağlı değil"; cText.style.color = "#8B0000"; cDot.style.backgroundColor = "#8B0000";
+                dStatus.innerText = "";
+            }
         }
 
         async function send(act) {
-            const pass = localStorage.getItem('kushane_pass');
-            await fetch(`${ESP32_IP}/control?action=${act}`, {
-                method: 'POST',
-                headers: { 'X-PASSWORD': pass }
-            });
-            updateStatus();
+            try { 
+                await fetch(`${ESP32_IP}/control?action=${act}`, { 
+                    method: 'POST', 
+                    headers: { 'X-PASSWORD': localStorage.getItem('kushane_pass') } 
+                }); 
+                updateStatus(); 
+            } catch (e) { updateStatus(); }
         }
 
         render();
-        if(isAuth) setInterval(updateStatus, 3000);
+        window.addEventListener('focus', updateStatus); 
     </script>
 </body>
-
 </html>
