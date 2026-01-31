@@ -1,0 +1,15 @@
+{
+  "name": "Kuşhane",
+  "short_name": "Kuşhane",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f0f0f",
+  "theme_color": "#1a1a1a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2550/2550431.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
