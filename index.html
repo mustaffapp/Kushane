@@ -8,44 +8,36 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f0f0f">
-    <link rel="apple-touch-icon" href="icon-k.png">
+    
+    <link rel="apple-touch-icon" href="/icon-k.png">
+    <link rel="icon" type="image/png" href="/icon-k.png">
+
     <title>Kuşhane</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap');
         :root { --ac-aktif: #8B0000; --kapat-aktif: #228B22; --pasif-gri: #444444; --border-light: rgba(255, 255, 255, 0.15); }
-        
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #0f0f0f url('pigeon_darkened.jpg') no-repeat center center fixed; background-size: cover; display: flex; justify-content: center; align-items: center; font-family: sans-serif; overflow: hidden; }
-        
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: none; flex-direction: column; justify-content: center; align-items: center; }
         .app-wrapper { width: 100%; max-width: 400px; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; padding: 20px; box-sizing: border-box; }
-        
         .top-icon { position: absolute; top: 30px; width: 1.6rem; height: 1.6rem; cursor: pointer; z-index: 110; opacity: 0.9; filter: drop-shadow(0.5px 0 0 white) drop-shadow(-0.5px 0 0 white) drop-shadow(0 0.5px 0 white) drop-shadow(0 -0.5px 0 white); }
         .pass-btn { left: 30px; } .settings-btn { right: 30px; }
-        
         .app-title { font-family: 'Playwrite AU TAS', cursive; font-size: 2.32rem; color: #000000; font-weight: bold; -webkit-text-stroke: 1.5px white; paint-order: stroke fill; margin-bottom: 25px; text-align: center; }
-        
         .numpad-area { background: #1a1a1a; border: 2px solid var(--border-light); border-radius: 30px; padding: 25px; width: 300px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,1); }
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
         .numpad button { background: #2a2a2a; border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white; border: none; cursor: pointer; }
-        
         #pass-display { width: 100%; padding: 10px 0; background: transparent; color: white; text-align: center; border: none; font-size: 1.8rem; letter-spacing: 12px; border-bottom: 1px solid var(--border-light); outline: none; }
         #error-msg { color: #ff4444; font-size: 0.9rem; height: 20px; margin-bottom: 15px; font-weight: bold; visibility: hidden; }
-
         .door-status-box { display: flex; align-items: center; margin-bottom: 40px; width: 85%; }
         #bird-house-icon { width: 1.6em; height: 1.6em; margin-right: 20px; filter: drop-shadow(0.6px 0 0 white) drop-shadow(-0.6px 0 0 white) drop-shadow(0 0.6px 0 white) drop-shadow(0 -0.6px 0 white); }
         .door-label, #door-status-text { font-size: 1.4rem; font-weight: bold; color: #000000; -webkit-text-stroke: 1px white; paint-order: stroke fill; }
-        
         .controls-area { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
         .btn { width: 100%; padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); font-size: 1.1rem; font-weight: bold; color: white; transition: all 0.4s ease; cursor: pointer; }
         .btn.not-connected { background-color: var(--pasif-gri) !important; opacity: 0.6; pointer-events: none; }
         .btn.passive { opacity: 0.15; pointer-events: none; filter: grayscale(100%); }
-        
         #btn-open { background-color: var(--ac-aktif); }
         #btn-close { background-color: var(--kapat-aktif); }
-        
         .conn-container { width: 300px; display: flex; justify-content: flex-start; margin-top: 15px; }
         #main-app .conn-container { width: 85%; }
-
         .conn-status { font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 8px; -webkit-text-stroke: 0.3px black; paint-order: stroke fill; }
         .dot-sync { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background-color: #8B0000; }
     </style>
@@ -63,97 +55,48 @@
                 <button onclick="clearPass()">⌫</button><button onclick="addNum('0')">0</button><button onclick="checkPass()">✓</button>
             </div>
         </div>
-        <div class="conn-container">
-            <div class="conn-status">
-                <span class="dot-sync"></span>
-                <span class="text-sync">Bağlantı aranıyor</span>
-            </div>
-        </div>
+        <div class="conn-container"><div class="conn-status"><span class="dot-sync"></span><span class="text-sync">Bağlantı aranıyor</span></div></div>
     </div>
-
     <div id="main-app" class="app-wrapper">
-        <img class="top-icon pass-btn" src="lock_icon.png" onclick="resetAuth()">
-        <img class="top-icon settings-btn" src="settings_icon.png" onclick="openSettings()">
+        <img class="top-icon pass-btn" src="/lock_icon.png" onclick="resetAuth()">
+        <img class="top-icon settings-btn" src="/settings_icon.png" onclick="openSettings()">
         <div class="app-title">— Kuşhane —</div>
-        <div class="door-status-box">
-            <img id="bird-house-icon" src="birdhouse_icon.png">
-            <span class="door-label">Kapı: </span><span id="door-status-text"></span>
-        </div>
-        <div id="app-content" class="controls-area">
-            <button id="btn-open" class="btn" onclick="send('open')">Aç</button>
-            <button id="btn-close" class="btn" onclick="send('close')">Kapat</button>
-        </div>
-        <div class="conn-container">
-            <div class="conn-status">
-                <span class="dot-sync"></span>
-                <span class="text-sync">Bağlantı aranıyor</span>
-            </div>
-        </div>
+        <div class="door-status-box"><img id="bird-house-icon" src="/birdhouse_icon.png"><span class="door-label">Kapı: </span><span id="door-status-text"></span></div>
+        <div id="app-content" class="controls-area"><button id="btn-open" class="btn" onclick="send('open')">Aç</button><button id="btn-close" class="btn" onclick="send('close')">Kapat</button></div>
+        <div class="conn-container"><div class="conn-status"><span class="dot-sync"></span><span class="text-sync">Bağlantı aranıyor</span></div></div>
     </div>
-
     <script>
         let ESP32_IP = localStorage.getItem('kushane_ip') || window.location.origin;
         let isAuth = localStorage.getItem('kushane_auth') === 'true';
         let currentPass = "";
         let errorTimeout;
-
-        function showError(msg) {
-            const errorEl = document.getElementById('error-msg');
-            clearTimeout(errorTimeout);
-            errorEl.innerText = msg;
-            errorEl.style.visibility = "visible";
-            errorTimeout = setTimeout(() => { errorEl.style.visibility = "hidden"; }, 3000);
-        }
-
-        function addNum(n) { 
-            document.getElementById('error-msg').style.visibility = "hidden";
-            if(currentPass.length < 4) { currentPass += n; document.getElementById('pass-display').value = currentPass; } 
-        }
-        
+        function showError(msg) { const errorEl = document.getElementById('error-msg'); clearTimeout(errorTimeout); errorEl.innerText = msg; errorEl.style.visibility = "visible"; errorTimeout = setTimeout(() => { errorEl.style.visibility = "hidden"; }, 3000); }
+        function addNum(n) { document.getElementById('error-msg').style.visibility = "hidden"; if(currentPass.length < 4) { currentPass += n; document.getElementById('pass-display').value = currentPass; } }
         function clearPass() { currentPass = currentPass.slice(0,-1); document.getElementById('pass-display').value = currentPass; }
-
         async function checkPass() {
             if(currentPass.length === 4) {
                 try {
                     const res = await fetch(`${ESP32_IP}/status`, { headers: { 'X-PASSWORD': currentPass }, signal: AbortSignal.timeout(3000) });
-                    if(res.ok) {
-                        localStorage.setItem('kushane_pass', currentPass);
-                        localStorage.setItem('kushane_auth', 'true');
-                        isAuth = true; render();
-                    } else {
-                        showError("Hatalı Şifre");
-                        currentPass = ""; document.getElementById('pass-display').value = "";
-                    }
-                } catch (e) { 
-                    showError("Cihaz Bulunamadı"); 
-                    currentPass = ""; document.getElementById('pass-display').value = "";
-                }
+                    if(res.ok) { localStorage.setItem('kushane_pass', currentPass); localStorage.setItem('kushane_auth', 'true'); isAuth = true; render(); }
+                    else { showError("Hatalı Şifre"); currentPass = ""; document.getElementById('pass-display').value = ""; }
+                } catch (e) { showError("Cihaz Bulunamadı"); currentPass = ""; document.getElementById('pass-display').value = ""; }
             }
         }
-
         function render() {
-            const mainApp = document.getElementById('main-app');
-            const authScreen = document.getElementById('auth-screen');
+            const mainApp = document.getElementById('main-app'), authScreen = document.getElementById('auth-screen');
             if (!isAuth) { authScreen.style.display = "flex"; mainApp.style.display = "none"; } 
             else { authScreen.style.display = "none"; mainApp.style.display = "flex"; }
             updateStatus();
         }
-
         function openSettings() { let newIP = prompt("Cihaz IP:", ESP32_IP); if (newIP) { localStorage.setItem('kushane_ip', newIP); location.reload(); } }
         function resetAuth() { localStorage.removeItem('kushane_auth'); localStorage.removeItem('kushane_pass'); location.reload(); }
-
         async function updateStatus() {
-            const dots = document.querySelectorAll('.dot-sync'), texts = document.querySelectorAll('.text-sync'),
-                  bOpen = document.getElementById('btn-open'), bClose = document.getElementById('btn-close'),
-                  dStatus = document.getElementById('door-status-text');
-            
+            const dots = document.querySelectorAll('.dot-sync'), texts = document.querySelectorAll('.text-sync'), bOpen = document.getElementById('btn-open'), bClose = document.getElementById('btn-close'), dStatus = document.getElementById('door-status-text');
             try {
                 const res = await fetch(`${ESP32_IP}/status`, { headers: { 'X-PASSWORD': localStorage.getItem('kushane_pass') || '0000' }, signal: AbortSignal.timeout(2000) });
                 const data = await res.json();
-                
                 texts.forEach(t => { t.innerText = "Bağlı"; t.style.color = "#228B22"; });
                 dots.forEach(d => { d.style.backgroundColor = "#228B22"; });
-                
                 if (isAuth) {
                     if (data.locked) { dStatus.innerText = "Kapalı"; dStatus.style.color = "#228B22"; bOpen.classList.remove('passive'); bClose.classList.add('passive'); } 
                     else { dStatus.innerText = "Açık"; dStatus.style.color = "#8B0000"; bOpen.classList.add('passive'); bClose.classList.remove('passive'); }
@@ -165,10 +108,7 @@
                 if (isAuth) { dStatus.innerText = ""; bOpen.classList.add('not-connected'); bClose.classList.add('not-connected'); }
             }
         }
-
-        render();
-        setInterval(updateStatus, 5000);
-        window.addEventListener('focus', updateStatus);
+        render(); setInterval(updateStatus, 5000); window.addEventListener('focus', updateStatus);
     </script>
 </body>
 </html>
