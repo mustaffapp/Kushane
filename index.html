@@ -3,28 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="apple-touch-icon" sizes="180x180" href="/icon-k.png?v=7">
-    <link rel="manifest" href="/manifest.json">
+    <title>Kuşhane Web</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="icon-k.png">
+    <link rel="manifest" href="manifest.json">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
-    <title>Kuşhane</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap');
-        :root { --ac-aktif: #8B0000; --kapat-aktif: #228B22; --pasif-gri: #444444; }
-        body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #0f0f0f; display: flex; justify-content: center; align-items: center; font-family: sans-serif; overflow: hidden; color: white; }
+        :root { --ac-aktif: #8B0000; --kapat-aktif: #228B22; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; width: 100%; 
+            background: #0f0f0f url('https://images.unsplash.com/photo-1594614271360-0ed9a573ae15?q=80&w=1000') no-repeat center center fixed; 
+            background-size: cover; display: flex; justify-content: center; align-items: center; 
+            font-family: sans-serif; overflow: hidden; color: white; 
+        }
         .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .app-wrapper { width: 100%; max-width: 400px; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
         .app-title { font-family: 'Playwrite AU TAS', cursive; font-size: 2.32rem; color: #000000; font-weight: bold; -webkit-text-stroke: 1.5px white; paint-order: stroke fill; margin-bottom: 25px; text-align: center; }
         .numpad-area { background: #1a1a1a; border: 2px solid rgba(255,255,255,0.15); border-radius: 30px; padding: 25px; width: 300px; text-align: center; }
         .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .numpad button { background: #2a2a2a; border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white; border: none; }
+        .numpad button { background: #2a2a2a; border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white; border: none; cursor: pointer; }
         #pass-display { width: 100%; padding: 10px 0; background: transparent; color: white; text-align: center; border: none; font-size: 1.8rem; letter-spacing: 12px; outline: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
-        #error-msg { color: #ff4444; font-size: 0.9rem; height: 20px; margin-bottom: 15px; visibility: hidden; }
         .btn { width: 100%; padding: 22px; border-radius: 18px; font-size: 1.1rem; font-weight: bold; color: white; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; cursor: pointer; }
         #btn-open { background-color: var(--ac-aktif); }
         #btn-close { background-color: var(--kapat-aktif); }
-        .conn-container { width: 300px; display: flex; justify-content: flex-start; margin-top: 15px; }
-        .conn-status { font-size: 0.8rem; font-weight: bold; display: flex; align-items: center; gap: 8px; -webkit-text-stroke: 0.3px black; paint-order: stroke fill; }
-        .dot-sync { width: 8px; height: 8px; border-radius: 50%; background-color: #8B0000; }
+        .conn-status { font-size: 0.8rem; font-weight: bold; margin-top: 15px; display: flex; align-items: center; gap: 8px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background-color: #8B0000; }
     </style>
 </head>
 <body>
@@ -32,7 +35,7 @@
         <div class="app-title">— Kuşhane —</div>
         <div class="numpad-area">
             <input type="password" id="pass-display" readonly placeholder="••••">
-            <div id="error-msg">Hatalı Şifre</div>
+            <div id="error-msg" style="color:#ff4444; visibility:hidden; height:20px;">Hatalı Şifre</div>
             <div class="numpad">
                 <button onclick="addNum('1')">1</button><button onclick="addNum('2')">2</button><button onclick="addNum('3')">3</button>
                 <button onclick="addNum('4')">4</button><button onclick="addNum('5')">5</button><button onclick="addNum('6')">6</button>
@@ -40,55 +43,30 @@
                 <button onclick="addNum('C')">⌫</button><button onclick="addNum('0')">0</button><button onclick="checkPass()">✓</button>
             </div>
         </div>
-        <div class="conn-container"><div class="conn-status"><span class="dot-sync"></span><span id="stat-text">Bağlanıyor...</span></div></div>
+        <div class="conn-status"><div class="dot" id="conn-dot"></div><span id="stat-text">Bağlanıyor...</span></div>
     </div>
-
     <div id="main-app" class="app-wrapper">
         <div class="app-title">— Kuşhane —</div>
-        <div id="door-status" style="margin-bottom: 20px; font-weight: bold;">Durum: Bilinmiyor</div>
-        <button id="btn-open" class="btn" onclick="sendMQTT('open')">Aç</button>
-        <button id="btn-close" class="btn" onclick="sendMQTT('close')">Kapat</button>
+        <div id="door-status" style="margin-bottom:20px; font-weight:bold;">Durum: Bekleniyor</div>
+        <button id="btn-open" class="btn" onclick="send('open')">Aç</button>
+        <button id="btn-close" class="btn" onclick="send('close')">Kapat</button>
     </div>
-
     <script>
         const PIN = "2211";
-        const TOPIC_SUB = "kushane_v82_x92k_control/stat";
-        const TOPIC_PUB = "kushane_v82_x92k_control/ctrl";
-        let currentPass = "";
-        
-        const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "cl_" + Math.random());
-        client.onMessageArrived = (msg) => {
-            document.getElementById('door-status').innerText = "Durum: " + (msg.payloadString === "acik" ? "AÇIK" : "KAPALI");
-        };
+        const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.random().toString(16).substr(2, 8));
+        client.onMessageArrived = (m) => document.getElementById('door-status').innerText = "Durum: " + (m.payloadString === "acik" ? "AÇIK" : "KAPALI");
         client.connect({ onSuccess: () => { 
-            client.subscribe(TOPIC_SUB);
-            document.getElementById('stat-text').innerText = "Sisteme Bağlı";
-            document.querySelector('.dot-sync').style.backgroundColor = "#228B22";
+            client.subscribe("kushane_v82_x92k_control/stat");
+            document.getElementById('stat-text').innerText = "Bağlı";
+            document.getElementById('conn-dot').style.backgroundColor = "#228B22";
         }});
-
-        function addNum(n) {
-            if(n==='C') currentPass = currentPass.slice(0,-1);
-            else if(currentPass.length < 4) currentPass += n;
-            document.getElementById('pass-display').value = currentPass;
-        }
-
+        function addNum(n) { if(n==='C') currentPass = currentPass.slice(0,-1); else if(currentPass.length < 4) currentPass += n; document.getElementById('pass-display').value = currentPass; }
+        let currentPass = "";
         function checkPass() {
-            if(currentPass === PIN) {
-                document.getElementById('auth-screen').style.display = "none";
-                document.getElementById('main-app').style.display = "flex";
-            } else {
-                const err = document.getElementById('error-msg');
-                err.style.visibility = "visible";
-                currentPass = ""; document.getElementById('pass-display').value = "";
-                setTimeout(() => err.style.visibility = "hidden", 3000);
-            }
+            if(currentPass === PIN) { document.getElementById('auth-screen').style.display = "none"; document.getElementById('main-app').style.display = "flex"; }
+            else { currentPass = ""; document.getElementById('pass-display').value = ""; document.getElementById('error-msg').style.visibility = "visible"; }
         }
-
-        function sendMQTT(cmd) {
-            const message = new Paho.MQTT.Message(PIN + ":" + cmd);
-            message.destinationName = TOPIC_PUB;
-            client.send(message);
-        }
+        function send(cmd) { client.send(new Paho.MQTT.Message(PIN + ":" + cmd)).destinationName = "kushane_v82_x92k_control/ctrl"; }
     </script>
 </body>
 </html>
