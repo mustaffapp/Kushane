@@ -3,39 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Kuşhane Web</title>
+    <title>Kuşhane</title>
+    
     <link rel="apple-touch-icon" sizes="180x180" href="icon-k.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-k.png">
     <link rel="manifest" href="manifest.json">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap');
         :root { --ac-aktif: #8B0000; --kapat-aktif: #228B22; }
+        
         body, html { 
             margin: 0; padding: 0; height: 100%; width: 100%; 
             background: #0f0f0f url('pigeon_darkened.jpg') no-repeat center center fixed; 
             background-size: cover; display: flex; justify-content: center; align-items: center; 
             font-family: sans-serif; overflow: hidden; color: white; 
         }
-        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+        .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         .app-wrapper { width: 100%; max-width: 400px; height: 100%; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .app-title { font-family: 'Playwrite AU TAS', cursive; font-size: 2.32rem; color: #000000; font-weight: bold; -webkit-text-stroke: 1.5px white; paint-order: stroke fill; margin-bottom: 25px; text-align: center; }
-        .numpad-area { background: #1a1a1a; border: 2px solid rgba(255,255,255,0.15); border-radius: 30px; padding: 25px; width: 300px; text-align: center; }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .numpad button { background: #2a2a2a; border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white; border: none; cursor: pointer; }
-        #pass-display { width: 100%; padding: 10px 0; background: transparent; color: white; text-align: center; border: none; font-size: 1.8rem; letter-spacing: 12px; outline: none; border-bottom: 1px solid rgba(255,255,255,0.15); }
-        .btn { width: 100%; padding: 22px; border-radius: 18px; font-size: 1.1rem; font-weight: bold; color: white; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; cursor: pointer; }
+        
+        .app-title { 
+            font-family: 'Playwrite AU TAS', cursive; font-size: 2.3rem; color: #000; font-weight: bold; 
+            -webkit-text-stroke: 1.5px white; paint-order: stroke fill; margin-bottom: 25px; text-align: center; 
+        }
+
+        .numpad-area { background: #1a1a1a; border: 2px solid rgba(255,255,255,0.1); border-radius: 30px; padding: 25px; width: 280px; }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 15px; }
+        .numpad button { background: #2a2a2a; border-radius: 12px; padding: 18px; font-size: 1.2rem; color: white; border: none; cursor: pointer; transition: 0.2s; }
+        .numpad button:active { background: #444; }
+        
+        #pass-display { width: 100%; padding: 10px 0; background: transparent; color: white; text-align: center; border: none; font-size: 1.8rem; letter-spacing: 12px; outline: none; border-bottom: 1px solid #333; }
+        
+        .btn { width: 100%; padding: 20px; border-radius: 15px; font-size: 1.1rem; font-weight: bold; color: white; border: none; margin-bottom: 15px; cursor: pointer; }
         #btn-open { background-color: var(--ac-aktif); }
         #btn-close { background-color: var(--kapat-aktif); }
-        .conn-status { font-size: 0.8rem; font-weight: bold; margin-top: 15px; display: flex; align-items: center; gap: 8px; }
+
+        .conn-status { font-size: 0.8rem; margin-top: 15px; display: flex; align-items: center; gap: 8px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background-color: #8B0000; }
     </style>
 </head>
 <body>
+
     <div id="auth-screen" class="auth-overlay">
         <div class="app-title">— Kuşhane —</div>
         <div class="numpad-area">
             <input type="password" id="pass-display" readonly placeholder="••••">
-            <div id="error-msg" style="color:#ff4444; visibility:hidden; height:20px;">Hatalı Şifre</div>
+            <div id="error-msg" style="color:#ff4444; visibility:hidden; text-align:center; margin-top:10px; font-size:0.8rem;">Hatalı Şifre</div>
             <div class="numpad">
                 <button onclick="addNum('1')">1</button><button onclick="addNum('2')">2</button><button onclick="addNum('3')">3</button>
                 <button onclick="addNum('4')">4</button><button onclick="addNum('5')">5</button><button onclick="addNum('6')">6</button>
@@ -48,9 +63,9 @@
 
     <div id="main-app" class="app-wrapper">
         <div class="app-title">— Kuşhane —</div>
-        <div id="door-status" style="margin-bottom:20px; font-weight:bold;">Durum: Bekleniyor</div>
-        <button id="btn-open" class="btn" onclick="sendMQTT('open')">AÇ</button>
-        <button id="btn-close" class="btn" onclick="sendMQTT('close')">KAPAT</button>
+        <div id="door-status" style="margin-bottom:20px; font-weight:bold;">Sistem Durumu: Bekleniyor</div>
+        <button id="btn-open" class="btn" onclick="sendMQTT('open')">KAPIYI AÇ</button>
+        <button id="btn-close" class="btn" onclick="sendMQTT('close')">KAPIYI KAPAT</button>
     </div>
 
     <script>
@@ -61,13 +76,13 @@
         const client = new Paho.MQTT.Client("broker.hivemq.com", 8000, "web_" + Math.random().toString(16).substr(2, 8));
         
         client.onMessageArrived = (msg) => {
-            document.getElementById('door-status').innerText = "Durum: " + (msg.payloadString === "acik" ? "AÇIK" : "KAPALI");
+            document.getElementById('door-status').innerText = "Sistem Durumu: " + (msg.payloadString === "acik" ? "AÇIK" : "KAPALI");
         };
 
         client.connect({ 
             onSuccess: () => { 
                 client.subscribe(TOPIC_BASE + "/stat");
-                document.getElementById('stat-text').innerText = "Sisteme Bağlı";
+                document.getElementById('stat-text').innerText = "Bağlı";
                 document.getElementById('conn-dot').style.backgroundColor = "#228B22";
             }
         });
