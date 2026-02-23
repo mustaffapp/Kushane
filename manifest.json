@@ -1,18 +1,20 @@
 {
-  "name": "Kuşhane Kontrol",
+  "name": "Kuşhane",
   "short_name": "Kuşhane",
+  "description": "Akıllı Kuşhane Kapı Kontrol Sistemi",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#0f0f0f",
+  "background_color": "#000000",
+  "theme_color": "#800000",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "birdhouse_icon.png",
+      "src": "kushane-icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "birdhouse_icon.png",
+      "src": "kushane-icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
