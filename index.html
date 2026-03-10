@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3S Sound Control</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #121212; color: white; margin: 0; padding-top: 50px; }
+        .status-box { font-size: 1.5rem; margin-bottom: 30px; padding: 20px; border-radius: 10px; background: #1e1e1e; display: inline-block; min-width: 200px; }
+        .btn { border: none; color: white; padding: 20px 40px; font-size: 1.2rem; border-radius: 10px; cursor: pointer; margin: 10px; transition: 0.3s; width: 80%; max-width: 300px; }
+        .btn-open { background: #2ecc71; }
+        .btn-close { background: #e74c3c; }
+        .acik { color: #2ecc71; }
+        .kapali { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="status-box">Status: <span id="status-text">Connecting...</span></div><br>
+    <button class="btn btn-open" onclick="sendCommand('1')">OPEN</button><br>
+    <button class="btn btn-close" onclick="sendCommand('0')">CLOSE</button>
+
+    <script>
+        const DEVICE_ID = "87241905";
+        const client = new Paho.MQTT.Client("9461d979ef2044fd9edf271202106b7c.s1.eu.hivemq.cloud", Number(443), "web_client_" + Math.random().toString(16).substr(2, 8));
+
+        client.onMessageArrived = (msg) => {
+            if (msg.destinationName.includes("status")) {
+                const status = msg.payloadString;
+                const element = document.getElementById("status-text");
+                element.innerText = status.toUpperCase();
+                element.className = status; // Apply acik or kapali class
+            }
+        };
+
+        client.connect({
+            useSSL: true,
+            userName: "kushane_admin",
+            password: "pPBM8TpY!JWyz3S",
+            onSuccess: () => {
+                document.getElementById("status-text").innerText = "CONNECTED";
+                // Subscription fetches the RETAINED message immediately
+                client.subscribe(`kushane/${DEVICE_ID}/status`);
+            },
+            onFailure: (err) => { document.getElementById("status-text").innerText = "FAILED"; }
+        });
+
+        function sendCommand(val) {
+            const message = new Paho.MQTT.Message(val);
+            message.destinationName = `kushane/${DEVICE_ID}/control`;
+            client.send(message);
+        }
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+</html>
