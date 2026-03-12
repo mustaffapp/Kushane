@@ -36,12 +36,22 @@
             box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
         }
 
-        .app-wrapper { width: 100%; padding: 120px 20px 20px 20px; display: flex; flex-direction: column; align-items: center; z-index: 102; }
+        .app-wrapper { 
+            width: 100%; 
+            padding: 120px 20px 20px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            z-index: 102; 
+        }
+
         .app-title { font-family: 'Playwrite AU TAS', cursive; color: #000000 !important; font-weight: bold; -webkit-text-stroke: 1.5px white; paint-order: stroke fill; font-size: 2.3rem; margin-top: -10%; text-align: center; }
         
         .status-container {
             display: flex; align-items: center; justify-content: flex-start; align-self: flex-start;
-            width: calc(90% + 20px); margin-top: 30%; margin-bottom: 30%;
+            width: calc(90% + 20px); 
+            margin-top: 30%; 
+            margin-bottom: 20%; 
             margin-left: -20px; background-color: rgba(0, 0, 0, 0.75);
             padding: 15px 5% 15px 5%; border-radius: 0 12px 12px 0; box-sizing: border-box;
         }
@@ -52,7 +62,7 @@
         
         .btn { width: 100%; height: 75px; border-radius: 18px; font-size: 1.5rem; font-weight: bold; color: white; border: none; filter: var(--black-shadow); margin-bottom: 15px; transition: opacity 0.3s; display: flex; justify-content: center; align-items: center; }
         .btn:disabled { opacity: 0.8; cursor: not-allowed; }
-        #btn-open { background-color: var(--maroon); margin-top: 10%; }
+        #btn-open { background-color: var(--maroon); margin-top: 0; } /* %10 olan margin silinerek yukarı kaydırıldı */
         #btn-close { background-color: var(--forest-green); }
 
         .loader {
@@ -67,7 +77,18 @@
         }
         @keyframes animloader { 0% { width: 0%; } 100% { width: 100%; } }
 
-        .conn-status { position: absolute; bottom: 30px; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        .conn-status { 
+            position: absolute; 
+            bottom: 15%; 
+            left: 0;
+            right: 0;
+            font-size: 0.8rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px; 
+            z-index: 105; 
+        }
         .dot { width: 8px; height: 8px; border-radius: 50%; background-color: gray; }
         #statusText { font-weight: bold; }
 
@@ -115,31 +136,17 @@
         </div>
     </div>
 
-    <div id="settingsModal">
-        <div class="modal-box">
-            <div class="modal-title">Süre</div>
-            <div id="durationValue">10.0 sn</div>
-            <input type="range" id="timerSlider" class="duration-slider" 
-                   min="0" max="30" step="0.5" value="10" 
-                   oninput="updateSliderLabel(this.value)">
-            <div class="modal-footer">
-                <button class="m-btn btn-cancel" onclick="closeSettings()">İptal</button>
-                <button class="m-btn btn-ok" onclick="saveSettings()">Tamam</button>
-            </div>
-        </div>
-    </div>
-
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const myDeviceID = urlParams.get('device') || '00000000'; 
+        const myDeviceID = urlParams.get('device') || '87241905'; 
         
         const mqttOptions = {
             clientId: 'Kushane_PWA_' + Math.random().toString(16).substr(2, 8),
             username: 'kushane_admin', 
             password: 'pPBM8TpY!JWyz3S',
             clean: true,
-            connectTimeout: 4000
+            connectTimeout: 5000
         };
 
         const client = mqtt.connect('wss://9461d979ef2044fd9edf271202106b7c.s1.eu.hivemq.cloud:8884/mqtt', mqttOptions);
@@ -149,16 +156,10 @@
             document.getElementById('btn-close').disabled = !enabled;
         }
 
-        window.addEventListener('DOMContentLoaded', () => { 
-            const statusText = document.getElementById('statusText');
-            statusText.style.color = 'gray';
-            statusText.style.webkitTextStroke = "0.1px white";
-            setButtonsEnabled(false); 
-        });
-
         client.on('connect', () => {
             client.subscribe(`kushane/${myDeviceID}/status`);
             client.subscribe(`kushane/${myDeviceID}/presence`);
+            client.subscribe(`kushane/${myDeviceID}/current_timer`);
         });
 
         client.on('message', (topic, message) => {
@@ -170,64 +171,71 @@
                 if (msg === 'online') {
                     statusText.innerText = 'Bağlı';
                     statusText.style.color = '#228B22'; 
-                    statusText.style.webkitTextStroke = "0.1px white";
                     dot.style.backgroundColor = "#228B22";
                     setButtonsEnabled(true);
                 } else {
                     statusText.innerText = 'Bağlı Değil';
                     statusText.style.color = '#800000'; 
-                    statusText.style.webkitTextStroke = "0.1px white";
                     dot.style.backgroundColor = "#800000";
                     setButtonsEnabled(false);
                 }
             }
-        });
 
-        client.on('offline', () => {
-            const statusText = document.getElementById('statusText');
-            statusText.innerText = 'Bağlı Değil';
-            statusText.style.color = '#800000';
-            setButtonsEnabled(false);
-        });
-
-        function broadcastDoorAction(action) {
-            if (client.connected) {
-                client.publish(`kushane/${myDeviceID}/control`, action === 'acik' ? '1' : '0', { qos: 1 });
+            if (topic === `kushane/${myDeviceID}/status`) {
+                if (msg === "busy") {
+                    document.getElementById('btn-open').disabled = true;
+                    document.getElementById('btn-close').disabled = true;
+                } else {
+                    if (msg === "1") updateVisuals('acik');
+                    else if (msg === "0") updateVisuals('kapali');
+                }
             }
-        }
+
+            if (topic === `kushane/${myDeviceID}/current_timer`) {
+                const mod = document.getElementById('settingsModal');
+                if (mod && mod.style.display !== 'flex') {
+                    document.getElementById('timerSlider').value = msg;
+                    document.getElementById('durationValue').innerText = parseFloat(msg).toFixed(1) + " sn";
+                }
+            }
+        });
 
         function sendCommand(cmd) {
+            if (!client.connected) return;
             const btnOpen = document.getElementById('btn-open');
             const btnClose = document.getElementById('btn-close');
             const targetBtn = (cmd === 'acik') ? btnOpen : btnClose;
             const loaderMsg = (cmd === 'acik') ? 'Açılıyor' : 'Kapanıyor';
-            broadcastDoorAction(cmd);
+            
+            client.publish(`kushane/${myDeviceID}/control`, cmd === 'acik' ? '1' : '0', { qos: 1 });
+            
             btnOpen.disabled = true;
             btnClose.disabled = true;
             targetBtn.innerHTML = `<span class="loader" data-text="${loaderMsg}">${loaderMsg}</span>`;
+            
             setTimeout(() => {
-                btnOpen.innerHTML = "AÇ";
-                btnClose.innerHTML = "KAPAT";
+                targetBtn.innerHTML = (cmd === 'acik') ? "AÇ" : "KAPAT";
                 updateVisuals(cmd);
             }, 3000);
         }
 
         function updateVisuals(status) {
             const s = document.getElementById('stat');
-            const btnOpen = document.getElementById('btn-open');
-            const btnClose = document.getElementById('btn-close');
+            const bOpen = document.getElementById('btn-open');
+            const bClose = document.getElementById('btn-close');
             if (status === 'acik') { 
                 s.innerText = "Açık"; s.style.color = "#800000"; 
-                btnOpen.disabled = true; btnClose.disabled = false; 
+                bOpen.disabled = true; bClose.disabled = false; 
             } else { 
                 s.innerText = "Kapalı"; s.style.color = "#228B22"; 
-                btnOpen.disabled = false; btnClose.disabled = true; 
+                bOpen.disabled = false; bClose.disabled = true; 
             }
         }
 
         function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
         function updateSliderLabel(val) { document.getElementById('durationValue').innerText = parseFloat(val).toFixed(1) + " sn"; }
+        
         function saveSettings() {
             const val = document.getElementById('timerSlider').value;
             if (client.connected) {
@@ -239,63 +247,6 @@
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('./sw.js');
         }
-    </script>
-
-    <script>
-        (function() {
-            const _statusTopic = `kushane/${myDeviceID}/status`;
-            const _timerSyncTopic = `kushane/${myDeviceID}/current_timer`;
-            let _valAtOpen = "";
-
-            client.on('connect', () => {
-                client.subscribe(_statusTopic);
-                client.subscribe(_timerSyncTopic);
-            });
-
-             const _origOpen = window.openSettings;
-            window.openSettings = function() {
-                _valAtOpen = document.getElementById('timerSlider').value;
-                _origOpen();
-            };
-
-            const _origSave = window.saveSettings;
-            window.saveSettings = function() {
-                const _newVal = document.getElementById('timerSlider').value;
-                if (_newVal !== _valAtOpen) {
-                    _origSave(); 
-                } else {
-                    closeSettings(); 
-                }
-            };
-
-            client.on('message', (topic, message) => {
-                const _data = message.toString();
-                const _b1 = document.getElementById('btn-open');
-                const _b2 = document.getElementById('btn-close');
-
-                if (topic === _statusTopic) {
-                    if (_data === "busy") {
-                        if(_b1) _b1.disabled = true;
-                        if(_b2) _b2.disabled = true;
-                    } else {
-                        if (_data === "1") updateVisuals('acik');
-                        else if (_data === "0") updateVisuals('kapali');
-                    }
-                }
-
-                if (topic === _timerSyncTopic) {
-                    const _mod = document.getElementById('settingsModal');
-                    if (_mod && _mod.style.display !== 'flex') {
-                        const _sl = document.getElementById('timerSlider');
-                        const _lb = document.getElementById('durationValue');
-                        if (_sl && _lb) {
-                            _sl.value = _data;
-                            _lb.innerText = parseFloat(_data).toFixed(1) + " sn";
-                        }
-                    }
-                }
-            });
-        })();
     </script>
 </body>
 </html>
