@@ -1,0 +1,22 @@
+{
+  "short_name": "Kuşhane",
+  "name": "Kuşhane Kontrol",
+  "icons": [
+    {
+      "src": "kushane_icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "kushane_icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "theme_color": "#121212",
+  "background_color": "#000000",
+  "orientation": "portrait",
+  "scope": "./"
+}
