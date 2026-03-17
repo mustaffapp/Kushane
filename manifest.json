@@ -13,10 +13,10 @@
       "type": "image/png"
     }
   ],
-  "start_url": "./index.html",
+  "start_url": "/Kushane/index.html",
   "display": "standalone",
   "theme_color": "#121212",
   "background_color": "#000000",
   "orientation": "portrait",
-  "scope": "./"
+  "scope": "/Kushane/"
 }
