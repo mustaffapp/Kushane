@@ -4,268 +4,121 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Kuşhane</title>
-    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Kuşhane">
-    <meta name="mobile-web-app-capable" content="yes">
-    
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" sizes="180x180" href="kushane_icon.png">
-    <link rel="icon" type="image/png" href="kushane_icon.png">
-    
+    <link rel="apple-touch-icon" href="kushane_icon.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap');
-        :root { 
-            --maroon: #800000; 
-            --forest-green: #228B22; 
-            --white-shadow: drop-shadow(0px 0px 3px white);
-            --black-shadow: drop-shadow(0px 0px 3px black);
-            --industrial-amber: #FF9700;
-            --metallic-gold: #D4AF37;
-        }
-        
-        body, html { 
-            margin: 0; padding: 0; height: 100%; width: 100%; 
-            background: linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)), url('pigeon_darkened.jpg') no-repeat center center fixed; 
-            background-size: cover; 
-            font-family: sans-serif; color: white; overflow: hidden; 
-            display: flex; justify-content: center; align-items: stretch;
-        }
-
-        .vertical-column {
-            width: 100%; max-width: 400px; position: relative; height: 100%;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('pigeon_darkened.jpg') no-repeat center center;
-            background-size: cover; display: flex; flex-direction: column; align-items: center;
-            z-index: 10; box-sizing: border-box;
-            box-shadow: inset 0 0 40px rgba(0,0,0,0.8);
-        }
-
-        .app-wrapper { 
-            width: 100%; 
-            padding: 120px 20px 20px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            z-index: 102; 
-        }
-
-        .app-title { font-family: 'Playwrite AU TAS', cursive; color: #000000 !important; font-weight: bold; -webkit-text-stroke: 1.5px white; paint-order: stroke fill; font-size: 2.3rem; margin-top: -10%; text-align: center; }
-        
-        .status-container {
-            display: flex; align-items: center; justify-content: flex-start; align-self: flex-start;
-            width: calc(90% + 20px); 
-            margin-top: 30%; 
-            margin-bottom: 20%; 
-            margin-left: -20px; background-color: rgba(0, 0, 0, 0.75);
-            padding: 15px 5% 15px 5%; border-radius: 0 12px 12px 0; box-sizing: border-box;
-        }
-
-        .birdhouse-inline { width: 35px; height: 35px; flex-shrink: 0; background-image: url('birdhouse_icon.png'); background-size: contain; background-repeat: no-repeat; filter: var(--white-shadow); margin-right: 15px; margin-left: 5%; }
-        .label-text { width: 75px; font-weight: bold; font-size: 1.6rem; white-space: nowrap; }
-        #stat { width: 140px; font-weight: bold; font-size: 1.6rem; margin: 0; text-align: left; margin-left: 10%; color: gray; -webkit-text-stroke: 0.1px white; }
-        
-        .btn { width: 100%; height: 75px; border-radius: 18px; font-size: 1.5rem; font-weight: bold; color: white; border: none; filter: var(--black-shadow); margin-bottom: 15px; transition: opacity 0.3s; display: flex; justify-content: center; align-items: center; z-index: 103; position: relative; }
-        .btn:disabled { opacity: 0.8; cursor: not-allowed; }
-        #btn-open { background-color: var(--maroon); margin-top: 0; }
+        :root { --maroon: #800000; --forest-green: #228B22; --amber: #FF9700; }
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; background: #000 url('pigeon_darkened.jpg') no-repeat center center fixed; background-size: cover; font-family: sans-serif; color: white; overflow: hidden; display: flex; justify-content: center; }
+        .vertical-column { width: 100%; max-width: 400px; position: relative; display: flex; flex-direction: column; align-items: center; background: rgba(0,0,0,0.6); box-shadow: inset 0 0 50px #000; }
+        .app-wrapper { width: 100%; padding: 100px 20px 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        .app-title { font-family: 'Playwrite AU TAS', cursive; font-size: 2.2rem; margin-bottom: 50px; -webkit-text-stroke: 1.2px white; color: #000; text-align: center; }
+        .status-container { display: flex; align-items: center; width: 100%; background: rgba(0,0,0,0.85); padding: 20px; border-radius: 0 15px 15px 0; margin-left: -40px; margin-bottom: 40px; border-left: 5px solid var(--amber); }
+        .label-text { font-size: 1.5rem; font-weight: bold; margin-left: 40px; margin-right: 15px; }
+        #stat { font-size: 1.5rem; font-weight: bold; color: #aaa; }
+        .btn { width: 100%; height: 75px; border-radius: 18px; font-size: 1.6rem; font-weight: bold; color: white; border: none; margin-bottom: 20px; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .btn:active { transform: scale(0.98); opacity: 0.8; }
+        #btn-open { background-color: var(--maroon); }
         #btn-close { background-color: var(--forest-green); }
-
-        .loader {
-            display: inline-block; font-family: sans-serif; font-weight: bold;
-            color: var(--industrial-amber); letter-spacing: 2px; position: relative;
-            overflow: hidden; filter: drop-shadow(0px 0px 1px black);
-        }
-        .loader::after {
-            content: attr(data-text); position: absolute; left: 0; top: 0;
-            color: #000; width: 0%; height: 100%; overflow: hidden;
-            animation: animloader 3s linear infinite; white-space: nowrap;
-        }
-        @keyframes animloader { 0% { width: 0%; } 100% { width: 100%; } }
-
-        .conn-status { 
-            position: absolute; 
-            bottom: 5%; 
-            left: 0;
-            right: 0;
-            font-size: 0.8rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            gap: 8px; 
-            z-index: 101; 
-            pointer-events: none; 
-        }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background-color: gray; }
-        #statusText { font-weight: bold; }
-
-        .settings-btn {
-            position: absolute; top: 25px; right: 25px;
-            width: 35px; height: 35px; cursor: pointer; 
-            z-index: 2000; 
-            filter: invert(1) var(--black-shadow);
-        }
-        #settingsModal {
-            display: none; position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9);
-            z-index: 3000; justify-content: center; align-items: center;
-        }
-        .modal-box {
-            width: 80%; max-width: 320px; background: rgba(0, 0, 0, 0.95);
-            border: 1.5px solid white; border-radius: 18px;
-            padding: 30px; text-align: center; box-shadow: 0 0 20px rgba(0,0,0,1);
-        }
-        .modal-title { font-size: 1.8rem; font-weight: normal; margin-bottom: 20px; color: white; -webkit-text-stroke: 0.4px white; }
-        .duration-slider { width: 100%; margin: 20px 0; accent-color: white; }
-        #durationValue { font-size: 1.5rem; font-weight: normal; color: white; margin-bottom: 20px; }
-        .modal-footer { display: flex; gap: 15px; margin-top: 20px; }
-        .m-btn { flex: 1; height: 50px; border-radius: 12px; border: none; font-weight: bold; font-size: 1.1rem; color: white; cursor: pointer; }
-        .btn-ok { background-color: var(--forest-green); }
-        .btn-cancel { background-color: var(--maroon); }
+        .conn-status { position: absolute; bottom: 40px; display: flex; align-items: center; gap: 10px; font-size: 1rem; font-weight: bold; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background-color: #555; }
+        .settings-btn { position: absolute; top: 30px; right: 30px; width: 35px; filter: invert(1); cursor: pointer; z-index: 100; }
+        #settingsModal { display: none; position: fixed; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-box { width: 85%; max-width: 320px; background: #111; padding: 35px; border-radius: 25px; text-align: center; border: 1px solid #333; }
+        input[type=range] { width: 100%; margin: 25px 0; accent-color: white; }
     </style>
 </head>
 <body>
     <div class="vertical-column">
-        <img src="settings_icon.png" class="settings-btn" onclick="openSettings()" alt="Ayarlar">
-        
-        <div id="main-app" class="app-wrapper">
-            <div class="app-title">— Kuşhane —</div>
+        <img src="settings_icon.png" class="settings-btn" onclick="toggleModal(true)">
+        <div class="app-wrapper">
+            <div class="app-title">Kuşhane</div>
             <div class="status-container">
-                <div class="birdhouse-inline"></div>
                 <span class="label-text">Kapı:</span>
-                <span id="stat">Beklemede</span>
+                <span id="stat">Bekleniyor...</span>
             </div>
-            <button id="btn-open" class="btn" onclick="sendCommand('acik')">AÇ</button>
-            <button id="btn-close" class="btn" onclick="sendCommand('kapali')">KAPAT</button>
+            <button id="btn-open" class="btn" onclick="send('1')">AÇ</button>
+            <button id="btn-close" class="btn" onclick="send('0')">KAPAT</button>
         </div>
         <div class="conn-status">
             <div id="dot" class="dot"></div>
-            <span id="statusText">Cihaz Bekleniyor</span>
+            <span id="statusText">SİSTEM BAŞLATILIYOR</span>
         </div>
     </div>
 
     <div id="settingsModal">
         <div class="modal-box">
-            <div class="modal-title">Süre</div>
-            <div id="durationValue">10.0 sn</div>
-            <input type="range" id="timerSlider" class="duration-slider" 
-                   min="0" max="30" step="0.5" value="10" 
-                   oninput="updateSliderLabel(this.value)">
-            <div class="modal-footer">
-                <button class="m-btn btn-cancel" onclick="closeSettings()">İptal</button>
-                <button class="m-btn btn-ok" onclick="saveSettings()">Tamam</button>
+            <h2 style="margin:0">Süre Ayarı</h2>
+            <div id="durVal" style="font-size:1.8rem; margin:25px 0; color:var(--amber)">10.0 sn</div>
+            <input type="range" id="timerSld" min="1" max="30" step="0.5" value="10" oninput="updateLbl(this.value)">
+            <div style="display:flex; gap:15px; margin-top:10px">
+                <button onclick="toggleModal(false)" style="flex:1; padding:12px; background:#333; color:#fff; border:none; border-radius:12px; font-weight:bold">İPTAL</button>
+                <button onclick="save()" style="flex:1; padding:12px; background:var(--forest-green); color:#fff; border:none; border-radius:12px; font-weight:bold">KAYDET</button>
             </div>
         </div>
     </div>
 
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const myDeviceID = urlParams.get('device') || '87241905'; 
-        
-        const mqttOptions = {
-            clientId: 'Kushane_PWA_' + Math.floor(Math.random() * 1000000),
-            username: 'kushane_admin', 
-            password: 'pPBM8TpY!JWyz3S',
-            clean: true,
-            connectTimeout: 10000,
-            reconnectPeriod: 1000
+        const devID = "73215944"; 
+        const options = {
+            clientId: 'Kushane_App_' + Math.random().toString(16).substr(2, 5),
+            username: 'kushane_admin', password: 'pPBM8TpY!JWyz3S',
+            clean: true, connectTimeout: 15000, rejectUnauthorized: false
         };
 
-        const client = mqtt.connect('wss://9461d979ef2044fd9edf271202106b7c.s1.eu.hivemq.cloud:8884/mqtt', mqttOptions);
-
-        function setButtonsEnabled(enabled) {
-            document.getElementById('btn-open').disabled = !enabled;
-            document.getElementById('btn-close').disabled = !enabled;
-        }
+        const client = mqtt.connect('wss://9461d979ef2044fd9edf271202106b7c.s1.eu.hivemq.cloud:8884/mqtt', options);
 
         client.on('connect', () => {
-            client.subscribe(`kushane/${myDeviceID}/status`);
-            client.subscribe(`kushane/${myDeviceID}/presence`);
-            client.subscribe(`kushane/${myDeviceID}/current_timer`);
+            console.log("Bağlandı");
+            client.subscribe(`kushane/${devID}/status`);
+            client.subscribe(`kushane/${devID}/presence`);
+            client.subscribe(`kushane/${devID}/current_timer`);
         });
 
-        client.on('message', (topic, message) => {
-            const statusText = document.getElementById('statusText');
-            const dot = document.getElementById('dot');
-            const msg = message.toString();
-
-            if (topic === `kushane/${myDeviceID}/presence`) {
-                if (msg === 'online') {
-                    statusText.innerText = 'Bağlı';
-                    statusText.style.color = '#228B22'; 
-                    dot.style.backgroundColor = "#228B22";
-                    setButtonsEnabled(true);
-                } else {
-                    statusText.innerText = 'Bağlı Değil';
-                    statusText.style.color = '#800000'; 
-                    dot.style.backgroundColor = "#800000";
-                    setButtonsEnabled(false);
-                }
+        client.on('message', (topic, payload) => {
+            const msg = payload.toString().trim();
+            
+            if (topic === `kushane/${devID}/presence`) {
+                const online = (msg === 'online');
+                const st = document.getElementById('statusText');
+                const dt = document.getElementById('dot');
+                st.innerText = online ? 'CİHAZ BAĞLI' : 'CİHAZ ÇEVRİMDIŞI';
+                st.style.color = online ? '#228B22' : '#800000';
+                dt.style.backgroundColor = online ? '#228B22' : '#800000';
             }
 
-            if (topic === `kushane/${myDeviceID}/status`) {
-                if (msg === "busy") {
-                    document.getElementById('btn-open').disabled = true;
-                    document.getElementById('btn-close').disabled = true;
-                } else {
-                    if (msg === "1") updateVisuals('acik');
-                    else if (msg === "0") updateVisuals('kapali');
-                }
+            if (topic === `kushane/${devID}/status`) {
+                const s = document.getElementById('stat');
+                if (msg === "busy") { s.innerText = "İşlem Yapılıyor..."; s.style.color = "orange"; }
+                else if (msg === "1") { s.innerText = "Açık"; s.style.color = "white"; }
+                else if (msg === "0") { s.innerText = "Kapalı"; s.style.color = "white"; }
             }
 
-            if (topic === `kushane/${myDeviceID}/current_timer`) {
-                const mod = document.getElementById('settingsModal');
-                if (mod && mod.style.display !== 'flex') {
-                    document.getElementById('timerSlider').value = msg;
-                    document.getElementById('durationValue').innerText = parseFloat(msg).toFixed(1) + " sn";
-                }
+            if (topic === `kushane/${devID}/current_timer`) {
+                document.getElementById('timerSld').value = msg;
+                document.getElementById('durVal').innerText = msg + " sn";
             }
         });
 
-        function sendCommand(cmd) {
-            if (!client.connected || document.getElementById('statusText').innerText !== 'Bağlı') {
-                return;
-            }
-            const btnOpen = document.getElementById('btn-open');
-            const btnClose = document.getElementById('btn-close');
-            const targetBtn = (cmd === 'acik') ? btnOpen : btnClose;
-            const loaderMsg = (cmd === 'acik') ? 'Açılıyor' : 'Kapanıyor';
-            
-            client.publish(`kushane/${myDeviceID}/control`, cmd === 'acik' ? '1' : '0', { qos: 1 });
-            
-            btnOpen.disabled = true;
-            btnClose.disabled = true;
-            targetBtn.innerHTML = `<span class="loader" data-text="${loaderMsg}">${loaderMsg}</span>`;
-            
-            setTimeout(() => {
-                targetBtn.innerHTML = (cmd === 'acik') ? "AÇ" : "KAPAT";
-                updateVisuals(cmd);
-            }, 3000);
-        }
-
-        function updateVisuals(status) {
-            const s = document.getElementById('stat');
-            const bOpen = document.getElementById('btn-open');
-            const bClose = document.getElementById('btn-close');
-            if (status === 'acik') { 
-                s.innerText = "Açık"; s.style.color = "#800000"; 
-                bOpen.disabled = true; bClose.disabled = false; 
-            } else { 
-                s.innerText = "Kapalı"; s.style.color = "#228B22"; 
-                bOpen.disabled = false; bClose.disabled = true; 
-            }
-        }
-
-        function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
-        function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
-        function updateSliderLabel(val) { document.getElementById('durationValue').innerText = parseFloat(val).toFixed(1) + " sn"; }
-        function saveSettings() {
-            const val = document.getElementById('timerSlider').value;
+        function send(val) {
             if (client.connected) {
-                client.publish(`kushane/${myDeviceID}/set_timer`, val.toString(), { qos: 1, retain: true });
+                client.publish(`kushane/${devID}/control`, val, { qos: 1 });
             }
-            closeSettings();
         }
+
+        function save() {
+            const v = document.getElementById('timerSld').value;
+            if (client.connected) {
+                client.publish(`kushane/${devID}/set_timer`, v, { qos: 1, retain: true });
+            }
+            toggleModal(false);
+        }
+
+        function toggleModal(show) { document.getElementById('settingsModal').style.display = show ? 'flex' : 'none'; }
+        function updateLbl(v) { document.getElementById('durVal').innerText = v + " sn"; }
     </script>
 </body>
 </html>
