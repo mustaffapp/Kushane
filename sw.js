@@ -1,12 +1,11 @@
-const CACHE_NAME = 'kushane-v2';
+const CACHE_NAME = 'kushane-v3'; 
 const ASSETS = [
-  './',
-  './index.html',
-  './manifest.json',
-  './kushane_icon.png',
-  './birdhouse_icon.png',
-  './settings_icon.png',
-  './pigeon_darkened.jpg',
+  'index.html',
+  'manifest.json',
+  'kushane_icon.png',
+  'birdhouse_icon.png',
+  'settings_icon.png',
+  'pigeon_darkened.jpg',
   'https://unpkg.com/mqtt/dist/mqtt.min.js',
   'https://fonts.googleapis.com/css2?family=Playwrite+AU+TAS:wght@100..400&display=swap'
 ];
@@ -14,7 +13,7 @@ const ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return Promise.allSettled(ASSETS.map(asset => cache.add(asset)));
     })
   );
   self.skipWaiting();
@@ -28,10 +27,14 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('hivemq.cloud')) return;
+  if (event.request.url.includes('hivemq.cloud') || 
+      event.request.url.includes('fonts.gstatic.com')) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((response) => {
