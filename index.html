@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Kuşhane">
+    <meta name="mobile-web-app-capable" content="yes">
     
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" sizes="180x180" href="kushane_icon.png">
@@ -162,11 +163,12 @@
         const myDeviceID = urlParams.get('device') || '87241905'; 
         
         const mqttOptions = {
-            clientId: 'Kushane_PWA_' + Math.random().toString(16).substr(2, 8),
+            clientId: 'Kushane_PWA_' + Math.floor(Math.random() * 1000000),
             username: 'kushane_admin', 
             password: 'pPBM8TpY!JWyz3S',
             clean: true,
-            connectTimeout: 5000
+            connectTimeout: 10000,
+            reconnectPeriod: 1000
         };
 
         const client = mqtt.connect('wss://9461d979ef2044fd9edf271202106b7c.s1.eu.hivemq.cloud:8884/mqtt', mqttOptions);
@@ -222,10 +224,8 @@
 
         function sendCommand(cmd) {
             if (!client.connected || document.getElementById('statusText').innerText !== 'Bağlı') {
-                console.log("Bağlantı yok, komut gönderilmedi.");
                 return;
             }
-            
             const btnOpen = document.getElementById('btn-open');
             const btnClose = document.getElementById('btn-close');
             const targetBtn = (cmd === 'acik') ? btnOpen : btnClose;
@@ -259,17 +259,12 @@
         function openSettings() { document.getElementById('settingsModal').style.display = 'flex'; }
         function closeSettings() { document.getElementById('settingsModal').style.display = 'none'; }
         function updateSliderLabel(val) { document.getElementById('durationValue').innerText = parseFloat(val).toFixed(1) + " sn"; }
-        
         function saveSettings() {
             const val = document.getElementById('timerSlider').value;
             if (client.connected) {
                 client.publish(`kushane/${myDeviceID}/set_timer`, val.toString(), { qos: 1, retain: true });
             }
             closeSettings();
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
